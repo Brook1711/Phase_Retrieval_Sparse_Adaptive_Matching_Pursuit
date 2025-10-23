@@ -475,6 +475,12 @@ for iter_dca = 1:max_iter_dca
 
     W = lambda * (eye(d) - Y);
 
+    X1 = zeros(d, d);
+    X2 = zeros(d, d);
+    X3 = zeros(d, d);
+    Y1 = zeros(d, d);
+    Y2 = zeros(d, d);
+
     A_mat = A;
     I_d = eye(d);
     I_m = eye(m);
