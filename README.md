@@ -1,5 +1,5 @@
 # Phase_Retrieval_Sparse_Adaptive_Matching_Pursuit
-MATLAB algorithm for Yuqing Guo's  paper
+`Python` and `MATLAB` code for Yuqing Guo's  paper
 > Sparse Phase Retrieval for Clustered-Sparse Signals: A Graph Cut-Based Truncated Flow Approach
 
 which has been accepted by TSP, will be available soon on IEEE.
