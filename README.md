@@ -11,3 +11,13 @@ For a simple example code run, pls run the `SPR.py`, which shouldnt take long, a
 
 <img width="323" height="276" alt="d657f451df94f1b89b290f82b0b1006e" src="https://github.com/user-attachments/assets/c4626c0e-8ee8-41ee-ba61-5b676f9a1ae7" />
 
+```tex
+@ARTICLE{gctf,
+  author={Guo, Yuqing and Guo, Xufeng and Ying, Wang and Shi, Qingjiang},
+  journal={IEEE Trans. Signal Process.}, 
+  title={Sparse Phase Retrieval for Clustered-Sparse Signals: A Graph Cut-Based Truncated Flow Approach}, 
+  year={to appear, 2026},
+  volume={},
+  number={},
+  pages={}}
+```
