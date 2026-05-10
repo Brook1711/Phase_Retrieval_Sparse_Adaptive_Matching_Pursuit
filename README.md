@@ -13,7 +13,7 @@ For a simple example code run, pls run the `SPR.py`, which shouldnt take long, a
 
 
 if you find this repo useful, pls cite our paper using:
-
+# Citation
 ```tex
 @ARTICLE{gctf,
   author={Guo, Yuqing and Guo, Xufeng and Ying, Wang and Shi, Qingjiang},
