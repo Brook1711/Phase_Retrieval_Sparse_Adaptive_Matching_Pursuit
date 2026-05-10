@@ -1,12 +1,78 @@
-# SPR.py phase retrieval algorithms converted from MATLAB to Python.
-# This module implements multiple phase retrieval solvers and supporting utilities.
-# The code uses numpy for linear algebra and pure Python for graph flow operations.
-
 """%The default graph topology is the linear topology. 
 You can change the graph topology by adjusting "edge_start" and "edge_end"."""
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Main experiment script to compare all phase retrieval estimators.
+def main():
+    N = 32
+    K = 4
+    M = 96
+    SNR = 10
+
+    x0 = np.zeros(N, dtype=np.complex128)
+    x0[10:K+10] = np.exp(1j * 2.0 * np.pi * np.random.rand(K))
+    x0 = x0 / np.linalg.norm(x0)
+
+    A = (1.0 / np.sqrt(2.0)) * (np.random.randn(M, N) + 1j * np.random.randn(M, N))
+    b = A @ x0
+    y = np.abs(AWGN(b.reshape(-1, 1), SNR)).reshape(-1)
+
+    x_est_gctf = GCTF(A, y)
+    x_est_swf = SWF(A, y)
+    x_est_cprime = C_PRIME(A, y, 1e-2, 500)
+    x_est_saltmin = SparseAltMinPhase(A, y, 2 * K)
+    x_est_taf = truncate_amplitude_flow(A, y, 2 * K)
+    x_est_phaseliftoff = phaseliftoff(y, A)
+    x_est_hwf = hwf(A, y, K)
+    x_est_phasecut = phasecut(A, y)
+    x_est_gs = Gerchberg_Saxton(A, y)
+
+    plt.plot(np.abs(x_est_gctf), label='GCTF')
+    plt.plot(np.abs(x_est_swf), label='SWF')
+    plt.plot(np.abs(x_est_cprime), label='CPRIME')
+    plt.plot(np.abs(x_est_saltmin), label='SALTMIN')
+    plt.plot(np.abs(x_est_taf), label='TAF')
+    plt.plot(np.abs(x_est_phaseliftoff), label='PhaseLiftOff')
+    plt.plot(np.abs(x_est_hwf), label='HWF')
+    plt.plot(np.abs(x_est_phasecut), label='PhaseCut')
+    plt.plot(np.abs(x_est_gs), label='GS')
+    plt.legend()
+    plt.title('Phase Retrieval Estimates')
+    plt.xlabel('Index')
+    plt.ylabel('Magnitude')
+    plt.savefig('Figure1.pdf')
+    plt.show()
+    plt.close()
+
+    plt.figure()
+    x_est_original = GCTF(A, y)
+    x_est_module3_phaseliftoff = GCTF_module3_phaseliftoff(A, y)
+    x_est_module3_swf = GCTF_module3_swf(A, y)
+    x_est_module3_cprime = GCTF_module3_cprime(A, y)
+    x_est_module3_gs = GCTF_module3_gs(A, y)
+    x_est_module1_phaseliftoff = GCTF_module1_phaseliftoff(A, y)
+    x_est_module1_swf = GCTF_module1_swf(A, y)
+    x_est_module1_cprime = GCTF_module1_cprime(A, y)
+    x_est_module1_gs = GCTF_module1_gs(A, y)
+
+    plt.plot(np.abs(x_est_original), label='GCTF')
+    plt.plot(np.abs(x_est_module3_phaseliftoff), label='Module III PhaseLiftOff')
+    plt.plot(np.abs(x_est_module3_swf), label='Module III SWF')
+    plt.plot(np.abs(x_est_module3_cprime), label='Module III C-PRIME')
+    plt.plot(np.abs(x_est_module3_gs), label='Module III GS')
+    plt.plot(np.abs(x_est_module1_phaseliftoff), label='Module I PhaseLiftOff')
+    plt.plot(np.abs(x_est_module1_swf), label='Module I SWF')
+    plt.plot(np.abs(x_est_module1_cprime), label='Module I C-PRIME')
+    plt.plot(np.abs(x_est_module1_gs), label='Module I GS')
+    plt.legend()
+    plt.title('GCTF Module Comparisons')
+    plt.xlabel('Index')
+    plt.ylabel('Magnitude')
+    plt.savefig('Figure2.pdf')
+    plt.show()
+    plt.close()
 
 
 # Compute spectral initialization for phase retrieval.
@@ -1019,75 +1085,7 @@ def GCTF_module1_gs(A, y):
     return x_est
 
 
-# Main experiment script to compare all phase retrieval estimators.
-def main():
-    N = 32
-    K = 4
-    M = 96
-    SNR = 10
 
-    x0 = np.zeros(N, dtype=np.complex128)
-    x0[10:K+10] = np.exp(1j * 2.0 * np.pi * np.random.rand(K))
-    x0 = x0 / np.linalg.norm(x0)
-
-    A = (1.0 / np.sqrt(2.0)) * (np.random.randn(M, N) + 1j * np.random.randn(M, N))
-    b = A @ x0
-    y = np.abs(AWGN(b.reshape(-1, 1), SNR)).reshape(-1)
-
-    x_est_gctf = GCTF(A, y)
-    x_est_swf = SWF(A, y)
-    x_est_cprime = C_PRIME(A, y, 1e-2, 500)
-    x_est_saltmin = SparseAltMinPhase(A, y, 2 * K)
-    x_est_taf = truncate_amplitude_flow(A, y, 2 * K)
-    x_est_phaseliftoff = phaseliftoff(y, A)
-    x_est_hwf = hwf(A, y, K)
-    x_est_phasecut = phasecut(A, y)
-    x_est_gs = Gerchberg_Saxton(A, y)
-
-    plt.plot(np.abs(x_est_gctf), label='GCTF')
-    plt.plot(np.abs(x_est_swf), label='SWF')
-    plt.plot(np.abs(x_est_cprime), label='CPRIME')
-    plt.plot(np.abs(x_est_saltmin), label='SALTMIN')
-    plt.plot(np.abs(x_est_taf), label='TAF')
-    plt.plot(np.abs(x_est_phaseliftoff), label='PhaseLiftOff')
-    plt.plot(np.abs(x_est_hwf), label='HWF')
-    plt.plot(np.abs(x_est_phasecut), label='PhaseCut')
-    plt.plot(np.abs(x_est_gs), label='GS')
-    plt.legend()
-    plt.title('Phase Retrieval Estimates')
-    plt.xlabel('Index')
-    plt.ylabel('Magnitude')
-    plt.savefig('Figure1.pdf')
-    plt.show()
-    plt.close()
-
-    plt.figure()
-    x_est_original = GCTF(A, y)
-    x_est_module3_phaseliftoff = GCTF_module3_phaseliftoff(A, y)
-    x_est_module3_swf = GCTF_module3_swf(A, y)
-    x_est_module3_cprime = GCTF_module3_cprime(A, y)
-    x_est_module3_gs = GCTF_module3_gs(A, y)
-    x_est_module1_phaseliftoff = GCTF_module1_phaseliftoff(A, y)
-    x_est_module1_swf = GCTF_module1_swf(A, y)
-    x_est_module1_cprime = GCTF_module1_cprime(A, y)
-    x_est_module1_gs = GCTF_module1_gs(A, y)
-
-    plt.plot(np.abs(x_est_original), label='GCTF')
-    plt.plot(np.abs(x_est_module3_phaseliftoff), label='Module III PhaseLiftOff')
-    plt.plot(np.abs(x_est_module3_swf), label='Module III SWF')
-    plt.plot(np.abs(x_est_module3_cprime), label='Module III C-PRIME')
-    plt.plot(np.abs(x_est_module3_gs), label='Module III GS')
-    plt.plot(np.abs(x_est_module1_phaseliftoff), label='Module I PhaseLiftOff')
-    plt.plot(np.abs(x_est_module1_swf), label='Module I SWF')
-    plt.plot(np.abs(x_est_module1_cprime), label='Module I C-PRIME')
-    plt.plot(np.abs(x_est_module1_gs), label='Module I GS')
-    plt.legend()
-    plt.title('GCTF Module Comparisons')
-    plt.xlabel('Index')
-    plt.ylabel('Magnitude')
-    plt.savefig('Figure2.pdf')
-    plt.show()
-    plt.close()
 
 
 if __name__ == '__main__':
